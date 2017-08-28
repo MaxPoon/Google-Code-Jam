@@ -2,16 +2,19 @@ from collections import defaultdict
 def solve(s):
 	length = len(s)
 	dp = [[None]*(length//2+1) for _ in range(length)]
+	# dp[i][j] means the minimum number the of operations to get s[:i+1]
+	# while the last j characters are from clipboard
 	dp[0][0] = 1
 	dpMin = [1]*length
-	lastOccurence = defaultdict(list)
+	# dpMin[i] is the min value of dp[i]
+	occurence = defaultdict(list)
 	for i in range(1, length):
 		dp[i][0] = dpMin[i-1] + 1
 		for j in range(2, i+2):
 			copied = s[i-j+1:i+1]
 			if j <= (i+1)//2:
 				lastOccurenceIndex = None
-				for index in reversed(lastOccurence[copied]):
+				for index in reversed(occurence[copied]):
 					if index <= i-j:
 						lastOccurenceIndex = index
 						break
@@ -19,7 +22,7 @@ def solve(s):
 					dp[i][j] = dpMin[i-j] + 2 #copy and paste
 					if dp[lastOccurenceIndex][j] != None:
 						dp[i][j] = min(dp[i][j], dp[lastOccurenceIndex][j]+(i-j-lastOccurenceIndex)+1)
-			lastOccurence[copied].append(i)
+			occurence[copied].append(i)
 		dpMin[i] = min([n for n in dp[i] if n != None])
 	return dpMin[-1]
 
